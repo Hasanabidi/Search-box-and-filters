@@ -1,0 +1,162 @@
+import wixData from 'wix-data';
+
+export function input1_keyPress(event) {
+	
+
+ 
+let debounceTimer;
+ 
+
+ 
+$w("#vectorImage22").show();
+ 
+$w("#input1").value;
+ 
+    if (debounceTimer) {
+        clearTimeout(debounceTimer);
+        debounceTimer = undefined;
+    }
+    debounceTimer = setTimeout(() => {
+        filter($w("#input1").value); //ID of input form
+    }, 200);
+ 
+}
+ 
+let searchWord;
+ 
+function filter(search) {
+    if (searchWord !== search) {
+        $w("#dataset1").setFilter(wixData.filter().contains('title', search)); // ID of the dataset
+        searchWord = search;
+    }
+ 
+}
+
+
+
+
+
+ 
+// CLEAR SEARCH CODE
+$w.onReady(() => {
+ 
+    $w('#vectorImage22').onClick(() => {
+ 
+        $w("#input1").value = undefined
+        $w("#dataset1").setFilter(wixData.filter())
+ 
+        $w("#vectorImage22").hide();
+ 
+    })
+})
+ 
+
+
+
+
+$w.onReady(function () {
+
+ 
+
+    $w("#coursealltags, #gradealltags").onChange(function () {
+
+        search();
+
+    });
+
+ 
+
+    function search() {
+
+ 
+
+        let filter = wixData.filter();
+
+ 
+
+        let courIdx = $w("#coursealltags").selectedIndices;
+
+        let gradIdx = $w("#gradealltags").selectedIndices;
+
+       
+
+ 
+
+        let courVal = $w("#coursealltags").value;
+
+        let gradVal = $w("#gradealltags").value;
+
+        
+
+ 
+
+        if (courIdx.length > 0 || gradIdx.length > 0) {
+
+ 
+
+            filter = filter.hasAll("courseTag", courVal)
+
+                .and(filter = filter.hasAll("gradetag", gradVal))            
+
+ 
+
+            $w("#dataset1").setFilter(filter)
+
+                .then(count)
+
+ 
+
+        } else {
+
+            $w("#dataset1").setFilter(filter)
+
+                .then(count)
+
+        }
+
+ 
+
+        $w("#Clear").onClick(function () {
+
+            $w("#coursealltags, #gradealltags").value = undefined;
+
+            $w("#dataset1").setFilter(wixData.filter()).then(count);
+
+        });
+
+ 
+
+    }
+    function count() {
+
+        let count = $w("#dataset1").getTotalCount();
+
+        if (count > 0) {
+
+            $w("#countitem").text = `${count} resources found`;
+
+        } else { $w("#countitem").text = `No resources found`; }
+
+ 
+
+        return count;
+
+    }
+
+ 
+
+    $w("#dataset1").onReady(function () {
+
+        count();
+
+    });
+
+
+});
+
+/**
+*	Adds an event handler that runs when the cursor is inside the
+ input element and a key is pressed.
+	[Read more](https://www.wix.com/corvid/reference/$w.TextInputMixin.html#onKeyPress)
+*	 @param {$w.KeyboardEvent} event
+*/
